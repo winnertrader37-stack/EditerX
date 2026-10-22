@@ -1,0 +1,699 @@
+<!-- Naol Editer
+     Mobile Video Editing Studio
+     GitHub Pages compatible
+     File: index.html
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#090d17">
+
+  <title>Naol Editer — Mobile Studio</title>
+
+  <style>
+    body {
+      margin: 0;
+      background: #090d17;
+      color: #ffffff;
+      font-family: Arial, sans-serif;
+    }
+
+    header {
+      padding: 16px;
+      background: #111827;
+      border-bottom: 1px solid #26344a;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    h1 {
+      color: #44e5d1;
+      font-size: 21px;
+      margin: 0;
+    }
+
+    button, select, input, textarea {
+      font: inherit;
+    }
+
+    button {
+      background: #13283b;
+      color: white;
+      border: 1px solid #31506a;
+      border-radius: 10px;
+      padding: 11px;
+      cursor: pointer;
+    }
+
+    button:active {
+      background: #087f8c;
+    }
+
+    .export-button {
+      background: #00c9d9;
+      color: #06131b;
+      font-weight: bold;
+    }
+
+    main {
+      padding: 12px;
+      max-width: 850px;
+      margin: auto;
+    }
+
+    .preview {
+      background: #000;
+      min-height: 300px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 14px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    video {
+      width: 100%;
+      max-height: 55vh;
+      object-fit: contain;
+    }
+
+    .panel {
+      background: #111827;
+      border: 1px solid #26344a;
+      border-radius: 14px;
+      padding: 14px;
+      margin-top: 12px;
+    }
+
+    .panel h2 {
+      font-size: 16px;
+      color: #44e5d1;
+      margin-top: 0;
+    }
+
+    .field {
+      margin: 12px 0;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      color: #cbd5e1;
+      font-size: 13px;
+    }
+
+    input, select, textarea {
+      box-sizing: border-box;
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      color: white;
+      background: #080d17;
+      border: 1px solid #344256;
+    }
+
+    input[type="range"] {
+      padding: 0;
+    }
+
+    .tools {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 7px;
+      margin-top: 12px;
+    }
+
+    .tools button {
+      min-height: 60px;
+      font-size: 12px;
+    }
+
+    .timeline {
+      background: #080d17;
+      padding: 12px;
+      border-radius: 10px;
+      margin-top: 12px;
+    }
+
+    .track {
+      height: 38px;
+      border-radius: 6px;
+      background: #173c47;
+      border: 1px solid #44e5d1;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+
+    .track audio {
+      width: 100%;
+      height: 38px;
+    }
+
+    .caption {
+      position: absolute;
+      bottom: 12%;
+      left: 5%;
+      right: 5%;
+      text-align: center;
+      font-size: 26px;
+      font-weight: bold;
+      color: white;
+      text-shadow: 2px 2px 5px black;
+      pointer-events: none;
+    }
+
+    .mobile-dock {
+      position: sticky;
+      bottom: 0;
+      display: flex;
+      gap: 5px;
+      overflow-x: auto;
+      background: #090d17;
+      padding: 10px 4px;
+      margin-top: 16px;
+      border: 1px solid #26344a;
+      border-radius: 12px;
+    }
+
+    .mobile-dock button {
+      flex: 0 0 auto;
+      min-width: 65px;
+      font-size: 11px;
+    }
+
+    .status {
+      color: #9ca3af;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes zoomIn {
+      from { transform: scale(.5); }
+      to { transform: scale(1); }
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(30px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @media (min-width: 700px) {
+      .preview {
+        min-height: 420px;
+      }
+
+      .tools {
+        grid-template-columns: repeat(6, 1fr);
+      }
+    }
+  </style>
+</head>
+
+<body>
+<header>
+  <h1>Naol Editer</h1>
+  <button class="export-button" id="exportBtn">Export</button>
+</header>
+
+<main>
+  <section class="panel">
+    <h2>01 · Import media</h2>
+
+    <div class="field">
+      <label>Select video</label>
+      <input id="videoFile" type="file" accept="video/*">
+    </div>
+
+    <div class="field">
+      <label>Select music or audio</label>
+      <input id="audioFile" type="file" accept="audio/*">
+    </div>
+
+    <div class="field">
+      <label>Add overlay image</label>
+      <input id="imageFile" type="file" accept="image/*">
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>02 · Preview</h2>
+
+    <div class="preview" id="preview">
+      <video id="video" controls playsinline></video>
+      <div class="caption" id="caption"></div>
+    </div>
+
+    <p class="status" id="status">
+      Import a video to begin editing.
+    </p>
+  </section>
+
+  <section class="panel">
+    <h2>03 · Edit video</h2>
+
+    <div class="field">
+      <label>Trim start (seconds)</label>
+      <input id="trimStart" type="number" min="0" value="0" step=".1">
+    </div>
+
+    <div class="field">
+      <label>Trim end (seconds)</label>
+      <input id="trimEnd" type="number" min="0" value="0" step=".1">
+    </div>
+
+    <div class="field">
+      <label>Playback speed</label>
+      <select id="speed">
+        <option value=".25">0.25×</option>
+        <option value=".5">0.5×</option>
+        <option value="1" selected>1× Normal</option>
+        <option value="1.5">1.5×</option>
+        <option value="2">2×</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Aspect ratio</label>
+      <select id="ratio">
+        <option value="9/16">9:16 TikTok / Shorts</option>
+        <option value="16/9">16:9 YouTube</option>
+        <option value="1/1">1:1 Square</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Brightness</label>
+      <input id="brightness" type="range" min="30" max="200" value="100">
+    </div>
+
+    <div class="field">
+      <label>Contrast</label>
+      <input id="contrast" type="range" min="30" max="200" value="100">
+    </div>
+
+    <div class="field">
+      <label>Saturation</label>
+      <input id="saturation" type="range" min="0" max="200" value="100">
+    </div>
+
+    <div class="tools">
+      <button id="playBtn">▶ Play</button>
+      <button id="pauseBtn">Ⅱ Pause</button>
+      <button id="seekStartBtn">↤ Start</button>
+      <button id="seekEndBtn">End ↦</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>04 · Audio studio</h2>
+
+    <div class="field">
+      <label>Music player</label>
+      <audio id="audio" controls style="width:100%"></audio>
+    </div>
+
+    <div class="field">
+      <label>Video volume</label>
+      <input id="volume" type="range" min="0" max="1" step=".05" value="1">
+    </div>
+
+    <div class="field">
+      <label>Audio playback speed</label>
+      <input id="audioSpeed" type="range" min=".5" max="2" step=".1" value="1">
+    </div>
+
+    <div class="field">
+      <label>Sound effect preview</label>
+      <select id="soundEffect">
+        <option value="none">Original</option>
+        <option value="robot">Robot-style speed preview</option>
+        <option value="slow">Slow audio preview</option>
+        <option value="fast">Fast audio preview</option>
+      </select>
+    </div>
+
+    <button id="soundBtn">Generate sound effect</button>
+
+    <p class="status">
+      Audio playback controls are available. This starter version does
+      not mix separate music tracks into the exported video.
+    </p>
+  </section>
+
+  <section class="panel">
+    <h2>05 · Text and captions</h2>
+
+    <div class="field">
+      <label>Caption language</label>
+      <select id="language">
+        <option>English</option>
+        <option>Afaan Oromo</option>
+        <option>Amharic</option>
+        <option>Arabic</option>
+        <option>French</option>
+        <option>Spanish</option>
+        <option>Swahili</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Text overlay</label>
+      <textarea id="captionInput" rows="3"
+        placeholder="Write your caption here..."></textarea>
+    </div>
+
+    <div class="field">
+      <label>Text animation</label>
+      <select id="animation">
+        <option value="">None</option>
+        <option value="fadeIn .8s">Fade in</option>
+        <option value="zoomIn .8s">Zoom in</option>
+        <option value="slideUp .8s">Slide up</option>
+      </select>
+    </div>
+
+    <button id="applyCaptionBtn">Apply caption</button>
+  </section>
+
+  <section class="panel">
+    <h2>06 · Effects</h2>
+
+    <div class="field">
+      <label>Visual filter</label>
+      <select id="filter">
+        <option value="none">Original</option>
+        <option value="grayscale(1)">Black & white</option>
+        <option value="sepia(1)">Vintage</option>
+        <option value="saturate(1.7)">Vivid color</option>
+        <option value="contrast(1.4)">High contrast</option>
+        <option value="blur(2px)">Soft blur</option>
+      </select>
+    </div>
+
+    <button id="applyFilterBtn">Apply visual filter</button>
+
+    <div class="field">
+      <label>Export resolution</label>
+      <select id="resolution">
+        <option value="720">720p HD</option>
+        <option value="1080" selected>1080p Full HD</option>
+        <option value="1440">1440p QHD</option>
+        <option value="2160">2160p 4K (device permitting)</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Frame rate</label>
+      <select id="fps">
+        <option value="24">24 FPS</option>
+        <option value="30" selected>30 FPS</option>
+        <option value="60">60 FPS</option>
+      </select>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>07 · Timeline</h2>
+
+    <div class="timeline">
+      <div>Video track</div>
+      <div class="track" id="videoTrack"></div>
+      <div style="margin-top:12px">Audio track</div>
+      <div class="track">
+        <audio id="timelineAudio" controls></audio>
+      </div>
+    </div>
+
+    <p class="status">
+      Timeline preview is included. Multi-track professional rendering,
+      automatic subtitles, AI background removal and automatic camera
+      tracking require additional editing engines.
+    </p>
+  </section>
+
+  <nav class="mobile-dock">
+    <button data-target="preview">▣ Preview</button>
+    <button data-target="videoTrack">✂ Edit</button>
+    <button data-target="audio">♫ Audio</button>
+    <button data-target="captionInput">T Text</button>
+    <button data-target="filter">✦ Effects</button>
+    <button data-target="resolution">⇧ Export</button>
+  </nav>
+</main>
+
+<script>
+"use strict";
+
+const $ = id => document.getElementById(id);
+
+const video = $("video");
+const audio = $("audio");
+const preview = $("preview");
+const status = $("status");
+
+let videoURL = "";
+let audioURL = "";
+let imageURL = "";
+
+function setStatus(message) {
+  status.textContent = message;
+}
+
+$("videoFile").addEventListener("change", event => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  if (videoURL) URL.revokeObjectURL(videoURL);
+  videoURL = URL.createObjectURL(file);
+
+  video.src = videoURL;
+  video.load();
+
+  $("videoTrack").textContent = file.name;
+  setStatus("Video loaded: " + file.name);
+});
+
+video.addEventListener("loadedmetadata", () => {
+  $("trimEnd").value = video.duration.toFixed(1);
+  setStatus("Video ready. Duration: " + video.duration.toFixed(1) + " seconds.");
+});
+
+$("audioFile").addEventListener("change", event => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  if (audioURL) URL.revokeObjectURL(audioURL);
+  audioURL = URL.createObjectURL(file);
+
+  audio.src = audioURL;
+  $("timelineAudio").src = audioURL;
+
+  setStatus("Audio loaded: " + file.name);
+});
+
+$("imageFile").addEventListener("change", event => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  if (imageURL) URL.revokeObjectURL(imageURL);
+  imageURL = URL.createObjectURL(file);
+
+  let image = preview.querySelector(".overlay-image");
+
+  if (!image) {
+    image = document.createElement("img");
+    image.className = "overlay-image";
+    image.style.cssText =
+      "position:absolute;top:10%;right:5%;width:25%;z-index:3";
+    preview.appendChild(image);
+  }
+
+  image.src = imageURL;
+});
+
+$("playBtn").onclick = async () => {
+  if (!video.src) return setStatus("Please import a video first.");
+
+  const start = Math.max(0, Number($("trimStart").value) || 0);
+  if (video.currentTime < start) video.currentTime = start;
+
+  try {
+    await video.play();
+  } catch {
+    setStatus("Press Play again to allow video playback.");
+  }
+};
+
+$("pauseBtn").onclick = () => video.pause();
+
+$("seekStartBtn").onclick = () => {
+  video.currentTime = Math.max(0, Number($("trimStart").value) || 0);
+};
+
+$("seekEndBtn").onclick = () => {
+  const end = Number($("trimEnd").value);
+  if (Number.isFinite(end) && end > 0) {
+    video.currentTime = Math.min(end, video.duration || end);
+  }
+};
+
+video.addEventListener("timeupdate", () => {
+  const end = Number($("trimEnd").value);
+
+  if (end > 0 && video.currentTime >= end) {
+    video.pause();
+  }
+});
+
+$("speed").onchange = () => {
+  video.playbackRate = Number($("speed").value);
+};
+
+$("volume").oninput = () => {
+  video.volume = Number($("volume").value);
+};
+
+$("audioSpeed").oninput = () => {
+  audio.playbackRate = Number($("audioSpeed").value);
+};
+
+$("ratio").onchange = () => {
+  const ratio = $("ratio").value;
+  preview.style.aspectRatio = ratio.replace("/", " / ");
+  preview.style.minHeight = "0";
+};
+
+function updateVideoFilters() {
+  video.style.filter =
+    `brightness(${$("brightness").value}%) ` +
+    `contrast(${$("contrast").value}%) ` +
+    `saturate(${$("saturation").value}%)`;
+}
+
+["brightness", "contrast", "saturation"].forEach(id => {
+  $(id).addEventListener("input", updateVideoFilters);
+});
+
+$("applyCaptionBtn").onclick = () => {
+  const caption = $("captionInput").value.trim();
+  $("caption").textContent = caption;
+  $("caption").style.animation = $("animation").value;
+  setStatus(caption ? "Caption added to preview." : "Caption cleared.");
+};
+
+$("applyFilterBtn").onclick = () => {
+  const customFilter = $("filter").value;
+  updateVideoFilters();
+
+  if (customFilter !== "none") {
+    video.style.filter += " " + customFilter;
+  }
+
+  setStatus("Visual preview filter applied.");
+};
+
+$("soundEffect").onchange = () => {
+  const mode = $("soundEffect").value;
+
+  if (mode === "slow") audio.playbackRate = 0.7;
+  else if (mode === "fast") audio.playbackRate = 1.5;
+  else if (mode === "robot") audio.playbackRate = 1.2;
+  else audio.playbackRate = Number($("audioSpeed").value);
+
+  setStatus("Audio preview setting: " + mode);
+};
+
+$("soundBtn").onclick = async () => {
+  try {
+    const AudioContextClass =
+      window.AudioContext || window.webkitAudioContext;
+
+    if (!AudioContextClass) {
+      return setStatus("Sound generation is not supported by this browser.");
+    }
+
+    const context = new AudioContextClass();
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+
+    oscillator.type = "sawtooth";
+    oscillator.frequency.setValueAtTime(660, context.currentTime);
+    oscillator.frequency.exponentialRampToValueAtTime(
+      110, context.currentTime + 0.35
+    );
+
+    gain.gain.setValueAtTime(0.0001, context.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.15, context.currentTime + 0.03);
+    gain.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + 0.45);
+
+    oscillator.connect(gain);
+    gain.connect(context.destination);
+
+    await context.resume();
+    oscillator.start();
+    oscillator.stop(context.currentTime + 0.46);
+
+    setStatus("Sound effect preview played.");
+    oscillator.onended = () => context.close();
+  } catch {
+    setStatus("Unable to generate sound effect on this device.");
+  }
+};
+
+document.querySelectorAll(".mobile-dock button").forEach(button => {
+  button.addEventListener("click", () => {
+    const target = $(button.dataset.target);
+    if (target) target.scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
+  });
+});
+
+// Browser-based WebM preview export.
+// This does not provide full professional MP4 rendering.
+$("exportBtn").onclick = async () => {
+  if (!video.src) {
+    setStatus("Please import a video before exporting.");
+    return;
+  }
+
+  if (!HTMLCanvasElement.prototype.captureStream ||
+      !window.MediaRecorder) {
+    setStatus("This browser does not support canvas video export.");
+    return;
+  }
+
+  setStatus(
+    "This starter build supports preview editing. " +
+    "Full-quality export with every effect and music track requires " +
+    "a dedicated rendering engine."
+  );
+};
+
+window.addEventListener("beforeunload", () => {
+  if (videoURL) URL.revokeObjectURL(videoURL);
+  if (audioURL) URL.revokeObjectURL(audioURL);
+  if (imageURL) URL.revokeObjectURL(imageURL);
+});
+</script>
+
+</body>
+</html>
